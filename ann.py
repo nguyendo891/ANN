@@ -18,9 +18,9 @@ y = dataset.iloc[:, endcolumn].values
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 labelencoder_X1 = LabelEncoder()
-X[:, 1] = labelencoder_X1.fit_transform(X[:, 1])
+X[:, 0] = labelencoder_X1.fit_transform(X[:, 0])
 labelencoder_X2 = LabelEncoder()
-X[:, 2] = labelencoder_X1.fit_transform(X[:, 2])
+X[:, 1] = labelencoder_X2.fit_transform(X[:, 1])
 ct = ColumnTransformer([('encoder', OneHotEncoder(), [1])], remainder='passthrough')
 X = np.array(ct.fit_transform(X), dtype=np.float)
 X = X[:, 1:]
@@ -51,14 +51,14 @@ classifier = Sequential()
 
 # Adding the input layer and the first hidden layer with dropout,
 # the num_Neuron in hidden = (input+ouput)/2 is the experiment
-classifier.add(Dense(units = 6, kernel_initializer = 'uniform', activation = 'relu', input_dim = 11))
-classifier.add(Dropout(p = 0.1))
+classifier.add(Dense(units = 6, kernel_initializer = 'uniform', activation = 'relu', input_dim = 10))
+classifier.add(Dropout(rate = 0.1))
 # Adding the second hidden layer
 # units = ouput_dim
 # init = kernel_initializer _weight
 
 classifier.add(Dense(units = 6, kernel_initializer = 'uniform', activation = 'relu'))
-classifier.add(Dropout(p = 0.1))
+classifier.add(Dropout(rate = 0.1))
 # Adding the output layer
 classifier.add(Dense(units = 1, kernel_initializer = "uniform", activation = 'sigmoid'))
 # Compiling the ANN
@@ -75,18 +75,22 @@ y_pred = (y_pred > 0.5)
 #Predicting a single new observation
 """ Predict if the customer with the following informations will leave the bank:
 Geography: France
-Credit Score:600
-Gender: Male
-Age:40
-Tenure:3
-Balance:60000
-Number of Products: 2
-Has Credit Card: Yes
-Is Active Member:Yes
-Estimated Salary:50000"""
 
-new_prediction = classifier.predict(sc.transform(np.array([[0, 0, 600, 1, 40, 3, 60000, 2, 1, 1, 50000]])))
+Gender: Female
+Age:42
+Tenure:2
+Number of Products: 1
+Is Active Member:Yes
+Contract Online: No
+Internet Action: 0
+Having Vollkasko: No
+Kasco Change: 2
+"""
+new_prediction = classifier.predict(sc.transform(np.array([[0, 0,  42, 2, 1, 1, 0,0,0,2 ]])))
 new_prediction = (new_prediction > 0.5)
+
+
+
 # making confusion matrix
 from sklearn.metrics import confusion_matrix
 cm = confusion_matrix(y_test, y_pred)
@@ -100,7 +104,7 @@ from keras.layers import Dense
 
 def build_classifier():
     classifier = Sequential()
-    classifier.add(Dense(units=6, kernel_initializer='uniform', activation='relu', input_dim=11))
+    classifier.add(Dense(units=6, kernel_initializer='uniform', activation='relu', input_dim=10))
     classifier.add(Dense(units=6, kernel_initializer='uniform', activation='relu'))
     classifier.add(Dense(units=1, kernel_initializer="uniform", activation='sigmoid'))
     classifier.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
@@ -127,7 +131,7 @@ from keras.layers import Dense
 
 def build_classifier(optimizer):
     classifier = Sequential()
-    classifier.add(Dense(units=6, kernel_initializer='uniform', activation='relu', input_dim=11))
+    classifier.add(Dense(units=6, kernel_initializer='uniform', activation='relu', input_dim=10))
     classifier.add(Dense(units=6, kernel_initializer='uniform', activation='relu'))
     classifier.add(Dense(units=1, kernel_initializer="uniform", activation='sigmoid'))
     classifier.compile(optimizer= optimizer, loss='binary_crossentropy', metrics=['accuracy'])
@@ -145,6 +149,3 @@ grid_search = grid_search.fit(X_train,y_train)
 
 best_parameters = grid_search.best_params_
 best_accuracy = grid_search.best_score_
-
-
-
